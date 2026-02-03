@@ -1,0 +1,64 @@
+'use client'
+
+import Link from 'next/link'
+import { LazyMotion, m } from 'framer-motion'
+import ButtonSeobot from '@/components/ui/ButtonSeobot'
+
+const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
+
+export default function ThankYouContent() {
+  return (
+    <LazyMotion features={loadFeatures} strict>
+      <div className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-8 min-h-[60vh] flex items-center justify-center">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+        </div>
+
+        <m.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative z-10 w-full max-w-2xl"
+        >
+          <div className="glass rounded-2xl border border-white/10 p-8 md:p-12 text-center shadow-2xl">
+            <m.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 mb-6"
+            >
+              <svg
+                className="w-8 h-8 text-emerald-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </m.div>
+
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+              Thanks for providing your information
+            </h1>
+
+            <p className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-lg mx-auto mb-8">
+              We&apos;re currently in development and will let you know when the product is ready to test.
+            </p>
+
+            <Link href="/">
+              <ButtonSeobot variant="primary" size="lg" className="min-h-[48px] px-8">
+                Back to UpRank
+              </ButtonSeobot>
+            </Link>
+          </div>
+        </m.div>
+      </div>
+    </LazyMotion>
+  )
+}
