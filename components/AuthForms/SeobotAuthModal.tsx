@@ -8,6 +8,7 @@ import { FaTimes } from 'react-icons/fa'
 import ButtonSeobot from '../ui/ButtonSeobot'
 import { createClient } from '@/utils/supabase/client'
 import { trackEvent } from '@/lib/posthog'
+import { trackMeta } from '@/utils/trackMeta'
 
 interface SeobotAuthModalProps {
   isOpen: boolean
@@ -38,6 +39,8 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
       trackEvent('popup_opened', {
         source: 'try_now_modal',
       })
+
+      trackMeta('ViewContent')
     }
   }, [isOpen])
 
@@ -76,6 +79,8 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
               source: 'try_now_modal',
               email,
             })
+
+            trackMeta('Lead', { email })
           }
         }
       } catch (storageError) {
