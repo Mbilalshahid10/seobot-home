@@ -142,7 +142,7 @@ export default function PricingSection() {
                   </div>
 
                   {/* CTA Button */}
-                  <Link href="/app" className="block mb-6">
+                  <Link href="/" className="block mb-6">
                     <ButtonSeobot
                       variant={isPopular ? 'primary' : 'outline'}
                       size="lg"

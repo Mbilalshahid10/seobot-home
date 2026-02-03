@@ -35,7 +35,7 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
       setIsSubmitting(false)
       setFormError(null)
 
-      trackEvent('try_now_modal_opened', {
+      trackEvent('popup_opened', {
         source: 'try_now_modal',
       })
     }
@@ -59,16 +59,32 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
         if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
           const supabase = createClient()
           // Use insert (not upsert) so the same email/name can be submitted multiple times.
-          // If the database enforces a unique constraint on email, this may fail, but we
-          // intentionally do not block the UX or redirect.
-          await supabase.from('guest_users').insert({
+          const { error } = await supabase.from('guest_users').insert({
             email,
             full_name: fullName,
             source: 'try_now_modal_lead',
           })
+          if (error) {
+            trackEvent('signup_failed', {
+              source: 'try_now_modal',
+              email,
+              error_message: error.message,
+              error_code: error.code ?? undefined,
+            })
+          } else {
+            trackEvent('signup_success', {
+              source: 'try_now_modal',
+              email,
+            })
+          }
         }
       } catch (storageError) {
         // Don't block the UX if storage fails; still proceed to thank-you page.
+        trackEvent('signup_failed', {
+          source: 'try_now_modal',
+          email,
+          error_message: storageError instanceof Error ? storageError.message : 'Unknown error',
+        })
         console.warn('Lead storage failed:', storageError)
       }
 
@@ -140,6 +156,7 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                           type="text"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
+                          onFocus={() => trackEvent('form_focused_name', { source: 'try_now_modal' })}
                           required
                           className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 sm:py-3.5 text-white text-base focus:outline-none focus:border-primary-green transition-colors"
                           placeholder="Enter your full name"
@@ -155,6 +172,7 @@ export default function SeobotAuthModal({ isOpen, onClose }: SeobotAuthModalProp
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          onFocus={() => trackEvent('form_focused_email', { source: 'try_now_modal' })}
                           required
                           className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 sm:py-3.5 text-white text-base focus:outline-none focus:border-primary-green transition-colors"
                           placeholder="Enter your email"
