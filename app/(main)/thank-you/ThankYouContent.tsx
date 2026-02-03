@@ -3,10 +3,22 @@
 import Link from 'next/link'
 import { LazyMotion, m } from 'framer-motion'
 import ButtonSeobot from '@/components/ui/ButtonSeobot'
+import { useEffect, useRef } from 'react'
+import { trackMeta, META_CR_KEY } from '@/utils/trackMeta'
 
 const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
 
 export default function ThankYouContent() {
+  const hasTracked = useRef(false)
+
+  useEffect(() => {
+    if (hasTracked.current) return
+    if (typeof window !== 'undefined' && sessionStorage.getItem(META_CR_KEY)) return
+    hasTracked.current = true
+    if (typeof window !== 'undefined') sessionStorage.setItem(META_CR_KEY, '1')
+    trackMeta('CompleteRegistration')
+  }, [])
+
   return (
     <LazyMotion features={loadFeatures} strict>
       <div className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-8 min-h-[60vh] flex items-center justify-center">
