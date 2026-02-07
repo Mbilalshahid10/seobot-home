@@ -114,6 +114,7 @@ export default function BetaSignupForm() {
         console.warn('Lead storage failed:', storageError)
       }
 
+      sessionStorage.setItem('signup_email', email)
       await new Promise(r => setTimeout(r, REDIRECT_DELAY_MS))
       window.location.href = '/thank-you'
     } catch (error) {

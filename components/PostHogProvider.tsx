@@ -155,24 +155,14 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
     }
   }, [isInitialized])
 
-  // Always render children, PostHogProvider is optional
+  // Always use PostHogProvider wrapper so React never remounts children
+  // when isInitialized flips. posthog is a singleton — before init, ops are no-ops/queued.
   return (
-    <>
-      {isInitialized && posthog.__loaded ? (
-        <PostHogProvider client={posthog}>
-          <Suspense fallback={null}>
-            <PostHogPageView />
-          </Suspense>
-          {children}
-        </PostHogProvider>
-      ) : (
-        <>
-          <Suspense fallback={null}>
-            <PostHogPageView />
-          </Suspense>
-          {children}
-        </>
-      )}
-    </>
+    <PostHogProvider client={posthog}>
+      <Suspense fallback={null}>
+        <PostHogPageView />
+      </Suspense>
+      {children}
+    </PostHogProvider>
   )
 }
