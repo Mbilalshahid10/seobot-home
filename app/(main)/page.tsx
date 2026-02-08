@@ -95,7 +95,7 @@ export default function Home() {
           <div className="flex items-center justify-center gap-6 text-xs text-slate-400 font-medium">
             <span className="flex items-center gap-1"><span className="material-icons-outlined text-sm">credit_card_off</span> No credit card required</span>
             <span>•</span>
-            <span className="flex items-center gap-1"><span className="material-icons-outlined text-sm">group</span> Limited to 500 beta members</span>
+            <span className="flex items-center gap-1"><span className="material-icons-outlined text-sm">group</span> Limited to 75 beta members</span>
           </div>
 
           {/* Animated App Mockup */}
@@ -291,9 +291,9 @@ export default function Home() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/30 border border-green-800 rounded-full text-green-400 text-[10px] font-bold uppercase tracking-wide">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-              Beta limited to 500 founding members
+              Beta limited to 75 founding members
             </div>
-            <p className="text-xs text-slate-600 mt-3 max-w-sm mx-auto">Capped at 500 to maintain generation quality and give every founding member hands-on support.</p>
+            <p className="text-xs text-slate-600 mt-3 max-w-sm mx-auto">Capped at 75 to maintain generation quality and give every founding member hands-on support.</p>
           </div>
 
         </div>
