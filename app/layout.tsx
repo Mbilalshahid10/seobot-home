@@ -126,17 +126,12 @@ export default async function RootLayout({ children }: PropsWithChildren) {
             />
           </>
         )}
-        <Script
-          id="material-icons-loader"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              var l=document.createElement('link');
-              l.rel='stylesheet';
-              l.href='https://fonts.googleapis.com/icon?family=Material+Icons+Outlined&display=swap';
-              document.head.appendChild(l);
-            `,
-          }}
+        {/* Material Icons — preconnect + stylesheet in <head> for no FOUC */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined&display=block"
         />
       </head>
       <body
