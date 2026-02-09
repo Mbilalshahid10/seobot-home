@@ -249,29 +249,14 @@ function StreamText({ segments, speed = 6 }: { segments: CityAfterSegment[]; spe
 // BEFORE TEXT with cycling city name
 // ═══════════════════════════════════════════════════════════
 
-function BeforeText({ activeCityName, isVisible }: { activeCityName: string; isVisible: boolean }) {
-  const [displayCity, setDisplayCity] = useState(activeCityName);
-  const allNames = CITIES.map(c => c.city);
-
-  useEffect(() => {
-    let i = allNames.indexOf(activeCityName);
-    if (i === -1) i = 0;
-    setDisplayCity(allNames[i]);
-    if (!isVisible) return;
-    const interval = setInterval(() => {
-      i = (i + 1) % allNames.length;
-      setDisplayCity(allNames[i]);
-    }, 600);
-    return () => clearInterval(interval);
-  }, [activeCityName, isVisible]); // eslint-disable-line react-hooks/exhaustive-deps
-
+function BeforeText({ activeCityName }: { activeCityName: string }) {
   return (
     <span className="text-[#A39E95]">
       {GENERIC_PARTS.map((p, i) =>
         p === "{CITY}" ? (
           <span key={i} className="font-semibold text-[#991B1B] transition-all duration-200"
             style={{ textDecoration: 'underline', textDecorationColor: 'rgba(153,27,27,0.3)', textDecorationStyle: 'wavy', textUnderlineOffset: '4px' }}
-          >{displayCity}</span>
+          >{activeCityName}</span>
         ) : <span key={i}>{p}</span>
       )}
     </span>
@@ -382,23 +367,37 @@ export default function InteractiveDemo() {
 
   // ── Auto-play orchestration ──
 
+  // Unified before-phase cycling: cycle through all cities once, then auto-transition to "after"
   useEffect(() => {
     if (phase !== "before" || manualMode || !isVisible) return;
-    autoRef.current = setTimeout(() => {
-      setTransitioning(true);
-      setTimeout(() => {
-        setPhase("after");
-        setTransitioning(false);
-      }, 300);
-    }, 7000);
-    return () => clearTimeout(autoRef.current);
+    let steps = 0;
+    const interval = setInterval(() => {
+      steps++;
+      if (steps >= CITIES.length) {
+        clearInterval(interval);
+        setTransitioning(true);
+        setTimeout(() => {
+          setCityIdx(0);
+          setPhase("after");
+          setTransitioning(false);
+        }, 300);
+        return;
+      }
+      setCityIdx(prev => (prev + 1) % CITIES.length);
+    }, 800);
+    return () => clearInterval(interval);
   }, [phase, manualMode, isVisible]);
 
   useEffect(() => {
     if (phase !== "after" || manualMode || !isVisible) return;
     autoRef.current = setTimeout(() => {
-      setPhase("cycling");
-    }, 6000);
+      setTransitioning(true);
+      setTimeout(() => {
+        setCityIdx(prev => (prev + 1) % CITIES.length);
+        setPhase("cycling");
+        setTransitioning(false);
+      }, 250);
+    }, 3000);
     return () => clearTimeout(autoRef.current);
   }, [phase, manualMode, isVisible]);
 
@@ -410,20 +409,23 @@ export default function InteractiveDemo() {
         setCityIdx(prev => (prev + 1) % CITIES.length);
         setTransitioning(false);
       }, 250);
-    }, 6000);
+    }, 2000);
     return () => clearTimeout(autoRef.current);
   }, [phase, cityIdx, manualMode, isVisible]);
 
   // ── Manual controls ──
 
   function selectCity(i: number) {
-    if (i === cityIdx && isAfter) return;
+    if (i === cityIdx) return;
     setManualMode(true);
     clearTimeout(autoRef.current);
+    // Preserve "before" only when user explicitly toggled to it (manualMode already true)
+    // During auto-play before-cycling, go to "after" (user wants to see content)
+    const targetPhase = (isBefore && manualMode) ? "before" : "after";
     setTransitioning(true);
     setTimeout(() => {
       setCityIdx(i);
-      setPhase("after");
+      setPhase(targetPhase);
       setTransitioning(false);
     }, 200);
   }
@@ -583,7 +585,7 @@ export default function InteractiveDemo() {
                     {/* Text */}
                     <div className="mt-1.5 text-[13px] sm:text-[14px] leading-[1.85]">
                       {isBefore ? (
-                        <BeforeText activeCityName={city.city} isVisible={isVisible} key="before-text" />
+                        <BeforeText activeCityName={city.city} key="before-text" />
                       ) : (
                         <span className="text-[#1A1A19]">
                           <StreamText segments={city.after} speed={6} key={`after-${cityIdx}`} />
