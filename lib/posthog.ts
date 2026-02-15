@@ -1,8 +1,9 @@
 'use client';
 
 import posthog from 'posthog-js';
+import { content } from '@/lib/content';
 
-const PRODUCT_NAME = 'Seoscribed';
+const productName = content.brand.name;
 
 // Initialize PostHog only on client side
 export const initPostHog = () => {
@@ -23,7 +24,7 @@ export const initPostHog = () => {
       loaded: (posthogInstance) => {
         // Set product identifier as a user property
         posthogInstance.register({
-          product_name: PRODUCT_NAME,
+          product_name: productName,
         });
       },
       capture_pageview: false, // We'll handle pageviews manually for Next.js App Router
@@ -37,13 +38,13 @@ export const initPostHog = () => {
 // Get PostHog instance (returns null if not initialized)
 export const getPostHog = () => {
   if (typeof window === 'undefined') return null;
-  
+
   // Return the instance if it's loaded, otherwise return null
   // (Initialization is handled by PostHogProvider)
   if (posthog.__loaded) {
     return posthog;
   }
-  
+
   return null;
 };
 
@@ -54,7 +55,7 @@ const ensureProductName = () => {
   if (ph && ph.__loaded) {
     // Re-register to ensure it's set (this adds to all future events)
     ph.register({
-      product_name: PRODUCT_NAME,
+      product_name: productName,
     });
   }
 };
@@ -68,13 +69,13 @@ export const identifyUser = (userId: string, properties?: Record<string, any>) =
   ensureProductName();
 
   ph.identify(userId, {
-    product_name: PRODUCT_NAME,
+    product_name: productName,
     ...properties,
   });
-  
+
   // Also set as person property to ensure it appears in Identify events
   ph.setPersonProperties({
-    product_name: PRODUCT_NAME,
+    product_name: productName,
   });
 };
 
@@ -87,7 +88,7 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
   ensureProductName();
 
   ph.capture(eventName, {
-    product_name: PRODUCT_NAME,
+    product_name: productName,
     ...properties,
   });
 };
@@ -101,7 +102,7 @@ export const trackPageView = (path?: string) => {
   ensureProductName();
 
   ph.capture('$pageview', {
-    product_name: PRODUCT_NAME,
+    product_name: productName,
     $current_url: typeof window !== 'undefined' ? window.location.href : path,
   });
 };

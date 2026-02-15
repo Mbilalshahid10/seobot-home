@@ -10,6 +10,7 @@ import { JetBrains_Mono as FontMono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { PostHogProviderComponent } from '@/components/PostHogProvider';
 import AttributionCapture from '@/components/AttributionCapture';
+import { content } from '@/lib/content';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -36,9 +37,9 @@ const fontDisplay = FontDisplay({
 });
 
 const meta = {
-  title: 'Seoscribed',
-  description: 'AI-powered local content for directory founders scaling location pages.',
-  cardImage: '/og.png',
+  title: content.meta.title,
+  description: content.meta.description,
+  cardImage: content.meta.ogImage ?? '/og.png',
   robots: 'follow, index',
   favicon: '/favicon.ico',
   url: getURL()
@@ -52,10 +53,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: meta.title,
     description: meta.description,
     referrer: 'origin-when-cross-origin',
-    keywords: ['seo', 'directory', 'location pages', 'local content', 'ai'],
-    authors: [{ name: 'Ahmad S.' }],
-    creator: 'Seoscribed',
-    publisher: 'Seoscribed',
+    keywords: content.meta.keywords ?? ['seo', 'directory', 'location pages', 'local content', 'ai'],
+    authors: [{ name: content.meta.author ?? 'Ahmad S.' }],
+    creator: content.brand.name,
+    publisher: content.brand.name,
     robots: meta.robots,
     icons: { icon: meta.favicon },
     metadataBase: new URL(meta.url),

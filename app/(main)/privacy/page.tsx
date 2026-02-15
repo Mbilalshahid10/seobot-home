@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import Logo from "@/components/Logo"
+import { content } from '@/lib/content'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Seoscribed',
+  title: `Privacy Policy | ${content.brand.name}`,
 }
 
 const linkClass =
@@ -92,7 +93,7 @@ export default function PrivacyPage() {
         <div className="max-w-[1120px] mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
             <div className="flex flex-col items-center md:items-start gap-1">
-              <p>&copy; 2026 Seoscribed. All rights reserved.</p>
+              <p>{content.footer?.copyright ?? `\u00A9 ${content.brand.copyrightYear ?? new Date().getFullYear()} ${content.brand.name}. All rights reserved.`}</p>
             </div>
             <div className="flex gap-6 mt-4 md:mt-0">
               <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>

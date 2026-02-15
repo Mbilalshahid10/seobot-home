@@ -4,8 +4,9 @@ import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useEffect, useRef, Suspense, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { content } from '@/lib/content'
 
-const PRODUCT_NAME = 'Seoscribed'
+const productName = content.brand.name
 
 function PostHogPageView({ isReady }: { isReady: boolean }) {
   const pathname = usePathname()
@@ -23,9 +24,9 @@ function PostHogPageView({ isReady }: { isReady: boolean }) {
         lastCapturedUrl.current = url
         posthog.capture('$pageview', {
           $current_url: url,
-          product_name: PRODUCT_NAME,
+          product_name: productName,
         })
-        console.log('PostHog Debug: Pageview tracked', { url, product_name: PRODUCT_NAME })
+        console.log('PostHog Debug: Pageview tracked', { url, product_name: productName })
       }
     }
   }, [pathname, searchParams, isReady])
@@ -78,34 +79,34 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
               loaded: (posthogInstance) => {
                 // Register product_name as a super property (included in all events including autocapture)
                 posthogInstance.register({
-                  product_name: PRODUCT_NAME,
+                  product_name: productName,
                 })
-                
+
                 // Also set as person property (affects Identify events)
                 posthogInstance.setPersonProperties({
-                  product_name: PRODUCT_NAME,
+                  product_name: productName,
                 })
-                
+
                 // Ensure properties persist by re-registering
                 // This ensures autocapture events get the property even if they fire before full initialization
                 if (posthogInstance.__loaded) {
                   posthogInstance.register({
-                    product_name: PRODUCT_NAME,
+                    product_name: productName,
                   })
                 }
-                
+
                 if (process.env.NODE_ENV === 'development') {
                   console.log('PostHog Debug: ✅ Initialized successfully!', {
-                    product_name: PRODUCT_NAME,
+                    product_name: productName,
                     isLoaded: posthogInstance.__loaded,
                   })
                 }
                 setIsInitialized(true)
-                
+
                 // Test event to verify it's working (development only)
                 if (process.env.NODE_ENV === 'development') {
                   posthogInstance.capture('posthog_initialized', {
-                    product_name: PRODUCT_NAME,
+                    product_name: productName,
                     timestamp: new Date().toISOString(),
                   })
                   console.log('PostHog Debug: Test event sent')
@@ -129,10 +130,10 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
         }
         // Ensure product_name is registered even if PostHog was initialized elsewhere
         posthog.register({
-          product_name: PRODUCT_NAME,
+          product_name: productName,
         })
         posthog.setPersonProperties({
-          product_name: PRODUCT_NAME,
+          product_name: productName,
         })
         setIsInitialized(true)
       }
@@ -146,15 +147,15 @@ export function PostHogProviderComponent({ children }: { children: React.ReactNo
       setTimeout(initializePostHog, 1)
     }
   }, [])
-  
+
   // Ensure product_name is registered whenever PostHog becomes available
   useEffect(() => {
     if (posthog.__loaded && !isInitialized) {
       posthog.register({
-        product_name: PRODUCT_NAME,
+        product_name: productName,
       })
       posthog.setPersonProperties({
-        product_name: PRODUCT_NAME,
+        product_name: productName,
       })
     }
   }, [isInitialized])

@@ -9,8 +9,10 @@ import { parseCookie, GUEST_ID_COOKIE_NAME, ATTR_COOKIE_NAME, ATTR_COOKIE_MAX_AG
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/landing/shared'
+import { content } from '@/lib/content'
 
 const REDIRECT_DELAY_MS = 1000
+const s = content.signup
 
 export default function BetaSignupForm() {
   const [email, setEmail] = useState('')
@@ -165,7 +167,7 @@ export default function BetaSignupForm() {
 
       sessionStorage.setItem('signup_email', email)
       await new Promise(r => setTimeout(r, REDIRECT_DELAY_MS))
-      window.location.href = '/thank-you'
+      window.location.href = s?.redirectPath ?? '/thank-you'
     } catch (error) {
       console.error('Lead submit error:', error)
       setFormError(error instanceof Error ? error.message : 'Unknown error')
@@ -177,7 +179,7 @@ export default function BetaSignupForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-5">
       <Input
         variant="dark"
-        placeholder="Your email address"
+        placeholder={s?.placeholder ?? "Your email address"}
         type="email"
         required
         value={email}
@@ -197,8 +199,8 @@ export default function BetaSignupForm() {
         disabled={isSubmitting}
         className="w-full px-5 py-4 text-base rounded-lg flex justify-center items-center gap-2"
       >
-        {isSubmitting ? 'Submitting...' : 'Get Free Beta Access'}
-        {!isSubmitting && <MaterialIcon name="arrow_forward" size="sm" />}
+        {isSubmitting ? (s?.buttonTextSubmitting ?? 'Submitting...') : (s?.buttonText ?? 'Get Free Beta Access')}
+        {!isSubmitting && <MaterialIcon name={s?.buttonIcon ?? "arrow_forward"} size="sm" />}
       </Button>
     </form>
   )
