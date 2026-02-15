@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
-import { CTAButton, MaterialIcon } from "@/components/landing/shared";
+import { content } from "@/lib/content";
+import { CTAButton, MaterialIcon, RichTextRenderer } from "@/components/landing/shared";
 import { Badge } from "@/components/ui/badge";
 
 const InteractiveDemo = dynamic(
@@ -27,59 +28,70 @@ const InteractiveDemo = dynamic(
   }
 );
 
+const c = content.hero;
+
 export function Hero() {
   return (
     <section id="hero" data-track-section="hero" className="pt-24 pb-20 overflow-hidden scroll-mt-16">
       <div className="max-w-[1120px] mx-auto px-6 text-center">
 
         {/* Badge */}
-        <Badge className="gap-2 px-3 py-1 uppercase tracking-wider mb-8">
-          <span className="inline-block w-2 h-2 rounded-full bg-brand-success animate-pulse"></span>
-          Beta Access Open
-        </Badge>
+        {c?.badge && (
+          <Badge className="gap-2 px-3 py-1 uppercase tracking-wider mb-8">
+            <span className="inline-block w-2 h-2 rounded-full bg-brand-success animate-pulse"></span>
+            {c.badge}
+          </Badge>
+        )}
 
         {/* Qualifier */}
-        <p className="text-base text-text-secondary font-medium mb-6">For directory founders scaling location pages across hundreds of cities.</p>
+        {c?.qualifier && (
+          <p className="text-base text-text-secondary font-medium mb-6">{c.qualifier}</p>
+        )}
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.08] mb-6 text-text-primary font-display tracking-tight">
-          500 location pages. Zero rankings.<br />
-          <span className="text-gradient italic">We fix that in under an hour.</span>
-        </h1>
+        {c?.headline && (
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.08] mb-6 text-text-primary font-display tracking-tight">
+            <RichTextRenderer segments={c.headline} />
+          </h1>
+        )}
 
         {/* Subhead */}
-        <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-14 leading-relaxed font-sans">
-          You built the directory. You uploaded the data. But Google sees 500 pages of identical copy — and it&apos;s ranking none of them.
-        </p>
+        {c?.subhead && (
+          <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-14 leading-relaxed font-sans">
+            {c.subhead}
+          </p>
+        )}
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-          <CTAButton
-            href="#mechanism"
-            ctaName="See the Difference"
-            ctaLocation="hero"
-            icon="arrow_downward"
-            className="hover:shadow-xl"
-          >
-            See the Difference
-          </CTAButton>
-          <CTAButton
-            href="#get-access"
-            ctaName="Get Free Beta Access"
-            ctaLocation="hero"
-            variant="outline"
-            icon="arrow_forward"
-          >
-            Get Free Beta Access
-          </CTAButton>
-        </div>
+        {c?.ctas && c.ctas.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            {c.ctas.map((cta) => (
+              <CTAButton
+                key={cta.text}
+                href={cta.href}
+                ctaName={cta.trackingName ?? cta.text}
+                ctaLocation={cta.trackingLocation ?? "hero"}
+                variant={cta.variant}
+                icon={cta.icon}
+                className={cta.variant !== "outline" ? "hover:shadow-xl" : undefined}
+              >
+                {cta.text}
+              </CTAButton>
+            ))}
+          </div>
+        )}
 
         {/* Trust line */}
-        <div className="flex items-center justify-center gap-6 text-xs text-text-muted font-medium">
-          <span className="flex items-center gap-1"><MaterialIcon name="credit_card_off" /> No credit card required</span>
-          <span>·</span>
-          <span className="flex items-center gap-1"><MaterialIcon name="group" /> Limited to 75 beta members</span>
-        </div>
+        {c?.trustLine && c.trustLine.length > 0 && (
+          <div className="flex items-center justify-center gap-6 text-xs text-text-muted font-medium">
+            {c.trustLine.map((item, i) => (
+              <span key={i} className="flex items-center gap-1">
+                {i > 0 && <span className="mr-6">&middot;</span>}
+                <MaterialIcon name={item.icon} /> {item.text}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Animated App Mockup */}
         <InteractiveDemo />

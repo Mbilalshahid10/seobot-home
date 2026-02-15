@@ -1,8 +1,12 @@
+import { content } from "@/lib/content";
+
+const brand = content.brand;
+
 export default function Logo({ href }: { href?: string }) {
   const img = (
     <img
-      src="/seoscribed-logo.webp"
-      alt="Seoscribed"
+      src={brand.logoPath}
+      alt={brand.logoAlt ?? brand.name}
       width={240}
       height={160}
       className="h-24 w-auto"

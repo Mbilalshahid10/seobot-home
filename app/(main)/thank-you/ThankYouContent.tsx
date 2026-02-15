@@ -5,8 +5,12 @@ import { useEffect, useRef } from 'react'
 import { trackMeta } from '@/utils/trackMeta'
 import { gtagEvent, trackGoogleAdsCompleteRegistrationConversion } from '@/lib/gtag'
 import { trackEvent, getPostHog } from '@/lib/posthog'
+import { content } from '@/lib/content'
 
 const loadFeatures = () => import('@/lib/framer-features').then(res => res.domAnimation)
+
+const ty = content.thankYou
+const brand = content.brand
 
 export default function ThankYouContent() {
   const hasTracked = useRef(false)
@@ -78,19 +82,19 @@ export default function ThankYouContent() {
             </m.div>
 
             <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A19] mb-4 tracking-tight">
-              Thanks for providing your information
+              {ty?.heading ?? "Thanks for providing your information"}
             </h1>
 
             <p className="text-[#706B63] text-lg md:text-xl leading-relaxed max-w-lg mx-auto mb-8">
-              We&apos;re currently in development and will let you know when the product is ready to test.
+              {ty?.description ?? "We\u2019re currently in development and will let you know when the product is ready to test."}
             </p>
 
             <a
-              href="/"
+              href={ty?.cta?.href ?? "/"}
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#C2410C] text-white rounded-lg font-medium hover:bg-[#9A3412] transition-all shadow-lg hover:shadow-xl"
             >
-              Back to Seoscribed
-              <span className="material-icons-outlined text-sm">arrow_forward</span>
+              {ty?.cta?.text ?? `Back to ${brand.name}`}
+              <span className="material-icons-outlined text-sm">{ty?.cta?.icon ?? "arrow_forward"}</span>
             </a>
           </div>
         </m.div>
