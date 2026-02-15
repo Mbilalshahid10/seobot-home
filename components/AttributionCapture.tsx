@@ -4,6 +4,14 @@ import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { parseCookie, ATTR_COOKIE_NAME, ATTR_COOKIE_MAX_AGE_DAYS, GUEST_ID_COOKIE_NAME } from '@/utils/cookies'
+import { trackMetaServerOnly } from '@/utils/trackMeta'
+
+declare global {
+  interface Window {
+    __fbPageViewEventId?: string
+    __fbPageViewSent?: Set<string>
+  }
+}
 
 type AttributionData = {
   utm_source?: string
@@ -12,6 +20,7 @@ type AttributionData = {
   utm_term?: string
   utm_content?: string
   utm_id?: string
+  fbclid?: string
   gclid?: string
   wbraid?: string
   gbraid?: string
@@ -50,6 +59,7 @@ function hasNewAttribution(data: AttributionData): boolean {
       data.utm_term ||
       data.utm_content ||
       data.utm_id ||
+      data.fbclid ||
       data.gclid ||
       data.wbraid ||
       data.gbraid ||
@@ -62,11 +72,11 @@ async function logAnonymousGuestVisit(base: AttributionData, url: URL) {
     // eslint-disable-next-line no-console
     console.log('logAnonymousGuestVisit called with', base, url.toString())
   }
-  // Only log when we actually have UTM attribution
-  if (!base.utm_source && !base.utm_medium && !base.utm_campaign) {
+  // Only log when we actually have UTM attribution or a click ID
+  if (!base.utm_source && !base.utm_medium && !base.utm_campaign && !base.fbclid && !base.gclid) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.log('logAnonymousGuestVisit: no UTM, aborting')
+      console.log('logAnonymousGuestVisit: no UTM/click ID, aborting')
     }
     return
   }
@@ -104,6 +114,8 @@ async function logAnonymousGuestVisit(base: AttributionData, url: URL) {
       utm_content: base.utm_content ?? null,
       landing_page: landingPath,
       referrer: base.initial_referrer ?? (typeof document !== 'undefined' ? document.referrer || null : null),
+      fbclid: base.fbclid ?? null,
+      gclid: base.gclid ?? null,
       })
 
     if (error) {
@@ -148,6 +160,7 @@ export default function AttributionCapture() {
       utm_term: getParam('utm_term'),
       utm_content: getParam('utm_content'),
       utm_id: getParam('utm_id'),
+      fbclid: getParam('fbclid'),
       gclid: getParam('gclid'),
       wbraid: getParam('wbraid'),
       gbraid: getParam('gbraid'),
@@ -187,51 +200,67 @@ export default function AttributionCapture() {
         // eslint-disable-next-line no-console
         console.debug('AttributionCapture: initial attribution set', base)
       }
-      return
+      // Fire CAPI PageView for first-touch visits too (falls through to shared logic below)
     }
 
-    const updated: AttributionData = { ...existing }
+    if (existing) {
+      const updated: AttributionData = { ...existing }
 
-    if (hasAttributionParams) {
-      updated.utm_source = current.utm_source ?? updated.utm_source
-      updated.utm_medium = current.utm_medium ?? updated.utm_medium
-      updated.utm_campaign = current.utm_campaign ?? updated.utm_campaign
-      updated.utm_term = current.utm_term ?? updated.utm_term
-      updated.utm_content = current.utm_content ?? updated.utm_content
-      updated.utm_id = current.utm_id ?? updated.utm_id
-      updated.gclid = current.gclid ?? updated.gclid
-      updated.wbraid = current.wbraid ?? updated.wbraid
-      updated.gbraid = current.gbraid ?? updated.gbraid
-      updated.msclkid = current.msclkid ?? updated.msclkid
-      if (!updated.first_landing_url) {
-        updated.first_landing_url = existing.first_landing_url || url.href
+      if (hasAttributionParams) {
+        updated.utm_source = current.utm_source ?? updated.utm_source
+        updated.utm_medium = current.utm_medium ?? updated.utm_medium
+        updated.utm_campaign = current.utm_campaign ?? updated.utm_campaign
+        updated.utm_term = current.utm_term ?? updated.utm_term
+        updated.utm_content = current.utm_content ?? updated.utm_content
+        updated.utm_id = current.utm_id ?? updated.utm_id
+        updated.fbclid = current.fbclid ?? updated.fbclid
+        updated.gclid = current.gclid ?? updated.gclid
+        updated.wbraid = current.wbraid ?? updated.wbraid
+        updated.gbraid = current.gbraid ?? updated.gbraid
+        updated.msclkid = current.msclkid ?? updated.msclkid
+        if (!updated.first_landing_url) {
+          updated.first_landing_url = existing.first_landing_url || url.href
+        }
+        if (!updated.initial_referrer) {
+          updated.initial_referrer = existing.initial_referrer || document.referrer || undefined
+        }
+        updated.last_landing_url = url.href
+        updated.last_touch_ts = now
+      } else {
+        // No new UTMs/click IDs: keep existing attribution, only refresh last_seen metadata
+        updated.last_touch_ts = now
+        updated.last_landing_url = url.href
       }
-      if (!updated.initial_referrer) {
-        updated.initial_referrer = existing.initial_referrer || document.referrer || undefined
+
+      setAttributionCookie(updated)
+
+      // We have attribution cookie but no guest_users row yet (hasGuestId: false) — insert one
+      // so this visit is still recorded (e.g. cookie was set on a prior direct visit, now they have UTMs)
+      if (hasAttributionParams) {
+        const cookies = parseCookie()
+        if (!cookies[GUEST_ID_COOKIE_NAME]) {
+          void logAnonymousGuestVisit(updated, url)
+        }
       }
-      updated.last_landing_url = url.href
-      updated.last_touch_ts = now
-    } else {
-      // No new UTMs/click IDs: keep existing attribution, only refresh last_seen metadata
-      updated.last_touch_ts = now
-      updated.last_landing_url = url.href
-    }
 
-    setAttributionCookie(updated)
-
-    // We have attribution cookie but no guest_users row yet (hasGuestId: false) — insert one
-    // so this visit is still recorded (e.g. cookie was set on a prior direct visit, now they have UTMs)
-    if (hasAttributionParams) {
-      const cookies = parseCookie()
-      if (!cookies[GUEST_ID_COOKIE_NAME]) {
-        void logAnonymousGuestVisit(updated, url)
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.debug('AttributionCapture: attribution updated', updated)
       }
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.debug('AttributionCapture: attribution updated', updated)
-    }
+    // --- CAPI PageView (server-side, deduplicated with pixel) ---
+    // Delay slightly so the pixel script has time to set window.__fbPageViewEventId
+    setTimeout(() => {
+      if (!window.__fbPageViewSent) window.__fbPageViewSent = new Set()
+      const pageKey = window.location.pathname
+      if (window.__fbPageViewSent.has(pageKey)) return
+      window.__fbPageViewSent.add(pageKey)
+
+      // Use the same eventId the pixel used (for dedup), or generate a fresh one
+      const pvEventId = window.__fbPageViewEventId || `${Date.now()}-${Math.random().toString(36).slice(2)}`
+      void trackMetaServerOnly('PageView', pvEventId)
+    }, 100)
   }, [pathname, searchParams])
 
   return null

@@ -99,7 +99,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
                 if(!window.__fbPixelInit){
                   window.__fbPixelInit=true;
                   fbq('init', '${PIXEL_ID}');
-                  fbq('track', 'PageView');
+                  var pvEventId = Date.now()+'-'+Math.random().toString(36).slice(2);
+                  window.__fbPageViewEventId = pvEventId;
+                  fbq('track', 'PageView', {}, {eventID: pvEventId});
                 }
               `,
             }}
@@ -120,7 +122,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', '${GOOGLE_ADS_ID}');
+                  gtag('config', '${GOOGLE_ADS_ID}', {
+                    allow_enhanced_conversions: true
+                  });
                 `,
               }}
             />

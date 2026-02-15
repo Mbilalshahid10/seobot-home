@@ -45,6 +45,20 @@ export default function BetaSignupForm() {
           const utmContent = urlParams.get('utm_content')
           const hasUrlUtms = !!(utmSource || utmMedium || utmCampaign || utmTerm || utmContent)
 
+          // Parse click IDs from attribution cookie (captured on landing)
+          let fbclid: string | null = null
+          let gclid: string | null = null
+          try {
+            const rawAttr = cookies[ATTR_COOKIE_NAME]
+            if (rawAttr) {
+              const attrData = JSON.parse(decodeURIComponent(rawAttr))
+              fbclid = attrData.fbclid || null
+              gclid = attrData.gclid || null
+            }
+          } catch {
+            // ignore malformed cookie
+          }
+
           let error = null as unknown as { message: string; code?: string | null } | null
           let staleCookie = false
 
@@ -64,6 +78,8 @@ export default function BetaSignupForm() {
                   utm_content: utmContent,
                   landing_page: window.location.pathname,
                 } : {}),
+                ...(fbclid ? { fbclid } : {}),
+                ...(gclid ? { gclid } : {}),
               })
               .eq('id', existingGuestId)
               .select('id')
@@ -103,6 +119,8 @@ export default function BetaSignupForm() {
                 utm_content: utmContent || null,
                 landing_page: window.location.pathname,
                 referrer: initialReferrer,
+                fbclid,
+                gclid,
               })
               .select('id')
               .single()

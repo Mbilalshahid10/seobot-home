@@ -313,6 +313,8 @@ export type Database = {
           utm_content: string | null
           landing_page: string | null
           referrer: string | null
+          fbclid: string | null
+          gclid: string | null
         }
         Insert: {
           id?: string
@@ -327,6 +329,8 @@ export type Database = {
           utm_content?: string | null
           landing_page?: string | null
           referrer?: string | null
+          fbclid?: string | null
+          gclid?: string | null
         }
         Update: {
           id?: string
@@ -341,6 +345,8 @@ export type Database = {
           utm_content?: string | null
           landing_page?: string | null
           referrer?: string | null
+          fbclid?: string | null
+          gclid?: string | null
         }
         Relationships: []
       }

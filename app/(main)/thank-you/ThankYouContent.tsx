@@ -32,7 +32,7 @@ export default function ThankYouContent() {
     tryTrack()
 
     // Google Ads CompleteRegistration conversion (fires once per session, gated by conversion label + Ads ID)
-    trackGoogleAdsCompleteRegistrationConversion()
+    trackGoogleAdsCompleteRegistrationConversion({ email })
     // Additional gtag event for thank-you page view
     if (typeof window !== 'undefined') {
       gtagEvent('thank_you_page_view', {

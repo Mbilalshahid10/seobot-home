@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { eventName, eventId, email, phone, customData, sourceUrl } = await req.json();
+  const { eventName, eventId, email, phone, customData, sourceUrl, fbc, fbp } = await req.json();
 
   const payload: Record<string, any> = {
     data: [
@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
           ph: phone ? [hash(phone.replace(/\D/g, ''))] : undefined,
           client_ip_address: req.headers.get('x-forwarded-for')?.split(',')[0],
           client_user_agent: req.headers.get('user-agent') || undefined,
-          fbp: req.cookies.get('_fbp')?.value,
-          fbc: req.cookies.get('_fbc')?.value
+          fbp: req.cookies.get('_fbp')?.value || fbp || undefined,
+          fbc: req.cookies.get('_fbc')?.value || fbc || undefined
         },
         custom_data: customData
       }

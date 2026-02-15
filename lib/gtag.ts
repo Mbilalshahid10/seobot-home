@@ -45,6 +45,12 @@ export function gtagEvent(eventName: string, params: GtagEventParams = {}) {
   }
 }
 
+function setUserData(email?: string) {
+  if (!email) return
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
+  window.gtag('set', 'user_data', { email })
+}
+
 function buildSendTo(label: string | undefined): string | undefined {
   const id = getGoogleAdsId()
   if (!id || !label) return undefined
@@ -52,11 +58,12 @@ function buildSendTo(label: string | undefined): string | undefined {
 }
 
 export function trackGoogleAdsLeadConversion(
-  params: GtagEventParams = {},
+  params: GtagEventParams & { email?: string } = {},
 ): void {
   const sendTo = buildSendTo(GOOGLE_ADS_LEAD_LABEL)
   if (!sendTo) return
 
+  setUserData(params.email)
   gtagEvent('conversion', {
     send_to: sendTo,
     ...params,
@@ -64,11 +71,12 @@ export function trackGoogleAdsLeadConversion(
 }
 
 export function trackGoogleAdsCompleteRegistrationConversion(
-  params: GtagEventParams = {},
+  params: GtagEventParams & { email?: string } = {},
 ): void {
   const sendTo = buildSendTo(GOOGLE_ADS_COMPLETE_REG_LABEL)
   if (!sendTo) return
 
+  setUserData(params.email)
   gtagEvent('conversion', {
     send_to: sendTo,
     ...params,

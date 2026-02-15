@@ -42,3 +42,9 @@ certificates
 
 .claude/settings.local.json
 CLAUDE.md
+/docs
+
+# generated analytics reports
+/analytics
+
+/scripts
