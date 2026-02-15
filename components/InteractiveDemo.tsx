@@ -192,7 +192,7 @@ function ScoreGauge({ score, isBefore }: { score: number; isBefore: boolean }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[15px] font-extrabold transition-colors duration-[400ms]"
+          <span className="text-[15px] font-extrabold transition-colors duration-400"
             style={{ color, fontVariantNumeric: 'tabular-nums' }}
           >{val}%</span>
         </div>
@@ -298,7 +298,7 @@ function IntroSequence({ onDone }: { onDone: () => void }) {
           return (
             <div
               key={i}
-              className="flex items-center gap-3 transition-all duration-[400ms]"
+              className="flex items-center gap-3 transition-all"
               style={{
                 opacity: active ? 1 : 0.15,
                 transform: `translateX(${active ? 0 : 10}px)`,
