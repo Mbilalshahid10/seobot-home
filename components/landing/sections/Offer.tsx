@@ -20,7 +20,7 @@ export function Offer() {
         </p>
 
         {/* Access card */}
-        <div id="get-access" className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 mb-10 backdrop-blur-sm scroll-mt-8">
+        <div id="get-access" className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 mb-10 scroll-mt-8">
 
           <p className="text-sm text-brand-accent font-bold uppercase tracking-wider mb-6">Free Beta Access Includes</p>
 

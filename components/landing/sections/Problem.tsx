@@ -41,7 +41,7 @@ export function Problem() {
               <span>You check Search Console. Most of your pages aren&apos;t even indexed. Duplicate content penalty.</span>
             </li>
           </ul>
-          <div className="absolute inset-0 bg-text-secondary/5 pointer-events-none rounded-2xl mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-text-secondary/5 pointer-events-none rounded-2xl"></div>
         </article>
 
         {/* Solution card */}

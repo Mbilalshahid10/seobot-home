@@ -153,7 +153,7 @@ function DotGrid({ isBefore }: { isBefore: boolean }) {
               width: 3.5, height: 3.5,
               backgroundColor: isBefore ? '#C2410C' : '#166534',
               opacity: isBefore ? 0.35 : 0.65,
-              transition: `all 0.4s ease ${isBefore ? '0s' : `${d}s`}`,
+              transition: `background-color 0.4s ease ${isBefore ? '0s' : `${d}s`}, opacity 0.4s ease ${isBefore ? '0s' : `${d}s`}`,
             }}
           />
         ))}
@@ -208,7 +208,7 @@ function ScoreGauge({ score, isBefore }: { score: number; isBefore: boolean }) {
 // STREAMING TEXT
 // ═══════════════════════════════════════════════════════════
 
-function StreamText({ segments, speed = 6 }: { segments: CityAfterSegment[]; speed?: number }) {
+function StreamText({ segments, speed = 16 }: { segments: CityAfterSegment[]; speed?: number }) {
   const [chars, setChars] = useState(0);
   const total = segments.reduce((s, seg) => s + seg.t.length, 0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -217,7 +217,7 @@ function StreamText({ segments, speed = 6 }: { segments: CityAfterSegment[]; spe
     setChars(0);
     let i = 0;
     intervalRef.current = setInterval(() => {
-      i += 2;
+      i += 5;
       setChars(i);
       if (i >= total) clearInterval(intervalRef.current);
     }, speed);
@@ -468,7 +468,7 @@ export default function InteractiveDemo() {
 
       {/* Glow — shifts color with phase */}
       <div
-        className="absolute -inset-4 rounded-[32px] blur-3xl pointer-events-none transition-all duration-1000"
+        className="absolute -inset-4 rounded-[32px] blur-xl pointer-events-none transition-opacity duration-1000"
         style={{
           background: isBefore
             ? 'radial-gradient(ellipse at center, rgba(194,65,12,0.05) 0%, transparent 70%)'
@@ -588,7 +588,7 @@ export default function InteractiveDemo() {
                         <BeforeText activeCityName={city.city} key="before-text" />
                       ) : (
                         <span className="text-[#1A1A19]">
-                          <StreamText segments={city.after} speed={6} key={`after-${cityIdx}`} />
+                          <StreamText segments={city.after} speed={16} key={`after-${cityIdx}`} />
                         </span>
                       )}
                     </div>
