@@ -12,5 +12,6 @@
   "aliases": {
     "components": "@/components",
     "utils": "@/utils/cn"
-  }
+  },
+  "_generatedWith": "shadcn@3.8.4 — do NOT re-run npx shadcn add on clones"
 }

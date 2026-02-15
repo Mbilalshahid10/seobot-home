@@ -6,6 +6,9 @@ import { trackEvent } from '@/lib/posthog'
 import { trackMeta } from '@/utils/trackMeta'
 import { gtagEvent, trackGoogleAdsLeadConversion } from '@/lib/gtag'
 import { parseCookie, GUEST_ID_COOKIE_NAME, ATTR_COOKIE_NAME, ATTR_COOKIE_MAX_AGE_DAYS } from '@/utils/cookies'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { MaterialIcon } from '@/components/landing/shared'
 
 const REDIRECT_DELAY_MS = 1000
 
@@ -172,8 +175,8 @@ export default function BetaSignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-5">
-      <input
-        className="w-full px-5 py-4 bg-[#141413] border border-[#3A3A37] rounded-lg text-white text-base placeholder-[#706B63] focus:outline-none focus:ring-2 focus:ring-[#C2410C] focus:border-transparent transition-all"
+      <Input
+        variant="dark"
         placeholder="Your email address"
         type="email"
         required
@@ -186,16 +189,17 @@ export default function BetaSignupForm() {
         disabled={isSubmitting}
       />
       {formError && (
-        <div className="text-red-400 text-sm px-1">{formError}</div>
+        <p role="alert" className="text-red-400 text-sm px-1">{formError}</p>
       )}
-      <button
-        className="w-full px-5 py-4 bg-[#C2410C] text-white font-bold text-base rounded-lg hover:bg-[#9A3412] transition-all flex justify-center items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+      <Button
+        variant="dark-primary"
         type="submit"
         disabled={isSubmitting}
+        className="w-full px-5 py-4 text-base rounded-lg flex justify-center items-center gap-2"
       >
         {isSubmitting ? 'Submitting...' : 'Get Free Beta Access'}
-        {!isSubmitting && <span className="material-icons-outlined text-sm">arrow_forward</span>}
-      </button>
+        {!isSubmitting && <MaterialIcon name="arrow_forward" size="sm" />}
+      </Button>
     </form>
   )
 }
