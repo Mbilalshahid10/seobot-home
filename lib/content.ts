@@ -27,6 +27,7 @@ export interface ListItem {
 export interface FAQItem {
   question: string;
   answer: string;
+  icon?: string; // Material icon name (used by FAQC)
 }
 
 // ── Section content (almost everything optional) ──
@@ -53,6 +54,15 @@ export interface HeroContent {
   subhead?: string;
   ctas?: CTAItem[];
   trustLine?: { icon: string; text: string }[];
+}
+
+export interface HeroBContent {
+  headline: RichText;
+  subhead?: string;
+  ctas?: CTAItem[];
+  image?: { src: string; alt: string };
+  socialProofLabel?: string;
+  socialProofLogos?: { src: string; alt: string }[];
 }
 
 export interface ProblemContent {
@@ -94,11 +104,19 @@ export interface FAQContent {
   headline?: string;
   items: FAQItem[]; // at least the items are needed, otherwise no FAQ
   cta?: CTAItem;
+  supportText?: string;
+  supportLink?: { text: string; href: string };
+}
+
+export interface FooterLinkGroup {
+  title: string;
+  links: { text: string; href: string }[];
 }
 
 export interface FooterContent {
   copyright?: string;
   links?: { text: string; href: string }[];
+  linkGroups?: FooterLinkGroup[];
 }
 
 export interface SignupContent {
@@ -122,6 +140,7 @@ export interface SiteContent {
   brand: BrandContent;
   meta: MetaContent;
   hero?: HeroContent;
+  heroB?: HeroBContent;
   problem?: ProblemContent;
   mechanism?: MechanismContent;
   offer?: OfferContent;
@@ -181,6 +200,38 @@ export const content: SiteContent = {
       { icon: "credit_card_off", text: "No credit card required" },
       { icon: "group", text: "Limited to 75 beta members" },
     ],
+  },
+
+  heroB: {
+    headline: [
+      "500 location pages.\n",
+      { text: "Zero rankings.", style: "muted" },
+      "\nWe fix that ",
+      { text: "in under an hour.", style: "gradient" },
+    ],
+    subhead:
+      "AI-powered local content that makes every location page genuinely unique — so Google actually ranks them.",
+    ctas: [
+      {
+        text: "Get Free Beta Access",
+        href: "#get-access",
+        variant: "default",
+        trackingName: "Get Free Beta Access",
+        trackingLocation: "hero",
+      },
+      {
+        text: "See How It Works",
+        href: "#mechanism",
+        variant: "outline",
+        trackingName: "See How It Works",
+        trackingLocation: "hero",
+      },
+    ],
+    image: {
+      src: "/og.png",
+      alt: "Seoscribed app showing location page content generation",
+    },
+    socialProofLabel: "Trusted by directory founders",
   },
 
   problem: {
@@ -304,21 +355,27 @@ export const content: SiteContent = {
   faq: {
     eyebrow: "Before you commit",
     headline: "Answers to what you\u2019re already thinking.",
+    supportText:
+      "Still have questions? We\u2019re happy to help you evaluate if Seoscribed is the right fit.",
+    supportLink: { text: "Learn how it works", href: "#mechanism" },
     items: [
       {
         question: "How is this different from ChatGPT?",
         answer:
           "ChatGPT generates one page at a time. Loop it with a script and every page still sounds the same. Seoscribed pulls real local context \u2014 landmarks, neighborhoods, demographics \u2014 to make each page genuinely distinct.",
+        icon: "psychology",
       },
       {
         question: "Will Google flag AI-generated content?",
         answer:
           "Google penalizes duplicate content, not AI content itself. Every page gets a uniqueness score before publish. If any page is too similar to another, you\u2019ll see it first.",
+        icon: "verified_user",
       },
       {
         question: "Can I see a sample before I decide?",
         answer:
           "Yes. Every founding member gets a free sample page generated for their niche within 24 hours of signing up. If the output doesn\u2019t meet your standard, no commitment \u2014 you\u2019re in beta, not a contract.",
+        icon: "preview",
       },
     ],
     cta: {
@@ -335,6 +392,22 @@ export const content: SiteContent = {
     links: [
       { text: "Privacy Policy", href: "/privacy" },
       { text: "Terms of Service", href: "/terms" },
+    ],
+    linkGroups: [
+      {
+        title: "Product",
+        links: [
+          { text: "How It Works", href: "#mechanism" },
+          { text: "Get Access", href: "#get-access" },
+        ],
+      },
+      {
+        title: "Legal",
+        links: [
+          { text: "Privacy Policy", href: "/privacy" },
+          { text: "Terms of Service", href: "/terms" },
+        ],
+      },
     ],
   },
 
